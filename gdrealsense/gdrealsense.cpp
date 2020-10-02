@@ -2,6 +2,7 @@
 
 using namespace godot;
 
+//Register methods that should be exposed to gdscript
 void Realsense::_register_methods() {
     register_method("get_depth_frame", &Realsense::get_depth_frame);
     register_method("get_frame_width", &Realsense::get_frame_width);
@@ -9,10 +10,6 @@ void Realsense::_register_methods() {
 }
 
 Realsense::Realsense() : depth_frame(rs2::frame()) {
-    //Get depth_units
-    //rs2::context().query_devices().front().query_sensors().front().set_option(RS2_OPTION_DEPTH_UNITS, 0.05f);
-    //depth_units = rs2::context().query_devices().front().query_sensors().front().get_option(RS2_OPTION_DEPTH_UNITS);
-
     //Initialize Decimation Filter
     dec_filter.set_option(RS2_OPTION_FILTER_MAGNITUDE, 2);
 
