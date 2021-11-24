@@ -37,16 +37,19 @@ if env['platform'] == '':
     print("No valid target platform selected.")
     quit();
 
+env.Replace(CXX='/opt/homebrew/bin/g++-11')
+env.Replace(CC='/opt/homebrew/bin/gcc-11')
+
 # Check our platform specifics
 if env['platform'] == "osx":
     env['target_path'] += 'osx/'
     cpp_library += '.osx'
     if env['target'] in ('debug', 'd'):
-        env.Append(CCFLAGS = ['-g','-O2', '-arch', 'x86_64', '-std=c++17'])
-        env.Append(LINKFLAGS = ['-arch', 'x86_64'])
+        env.Append(CCFLAGS = ['-g','-O2', '-arch', 'arm64', '-std=c++17'])
+        env.Append(LINKFLAGS = ['-arch', 'arm64'])
     else:
-        env.Append(CCFLAGS = ['-g','-O3', '-arch', 'x86_64', '-std=c++17'])
-        env.Append(LINKFLAGS = ['-arch', 'x86_64'])
+        env.Append(CCFLAGS = ['-g','-O3', '-arch', 'arm64', '-std=c++17'])
+        env.Append(LINKFLAGS = ['-arch', 'arm64'])
 
 elif env['platform'] in ('x11', 'linux'):
     env['target_path'] += 'x11/'

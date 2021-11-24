@@ -3,9 +3,18 @@ A completely open source augemented reality sandbox built with an Intel Realsens
 
 Right now I'm working on getting the docs in order. Give the repo a star and check back shortly for better information on what the project is and how to build, run, and/or contribute to it.
 
-## Building the relasense library
-In the root of the project run:
-`scons platform=osx`
+## Pull down and setup this project
+`git clone https://github.com/devenjarvis/terrabox.git`
+`cd terrabox`
+`git submodule update --init`
+`cd godot-cpp`
+`git submodule update --init`
+`scons platform=osx arch=arm64 generate_bindings=yes -j8`
+`cd ..`
+
+## Build/Install Realsense Lib
+Make sure you've built/installed the realsense library on your system. This process can vary by OS/System, check the README for instructions: https://github.com/IntelRealSense/librealsense
+
 
 
 ## Versions

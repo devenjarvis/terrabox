@@ -15,4 +15,4 @@ OSX.64="res://bin/osx/libgdrealsense.dylib"
 
 X11.64=[  ]
 Windows.64=[  ]
-OSX.64=[  ]
+OSX.64=[ ]
