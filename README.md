@@ -3,6 +3,21 @@ A completely open source augemented reality sandbox built with an Intel Realsens
 
 Right now I'm working on getting the docs in order. Give the repo a star and check back shortly for better information on what the project is and how to build, run, and/or contribute to it.
 
+## Setup Raspberry Pi
+This project assumes, and has only been tested with, a 4GB Raspberry Pi 4. Any other version of pi is untested and comes with no guarantees or support expectations. Furthermore, this project expects your Raspberry Pi 4 to be running a 64bit version of Ubuntu. Please reference the following instructions for proper setup:
+
+TBD
+
+## Install Realsense lib
+Once Ubuntu is setup on your Raspberry Pi and you are able to access it, we need to install the Realsense lib on your Pi. To do so follow these instructions:
+
+TBD
+
+## Install Godot
+Now that the realsense lib has been successfully installed on your system we want to install the Godot game engine so we can run, test, and build Terrabox. You can setup Godot with the following instructions:
+
+TBD
+
 ## Pull down and setup this project
 `git clone https://github.com/devenjarvis/terrabox.git`  
 `cd terrabox`  
