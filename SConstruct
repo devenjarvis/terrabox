@@ -37,9 +37,6 @@ if env['platform'] == '':
     print("No valid target platform selected.")
     quit();
 
-env.Replace(CXX='/opt/homebrew/bin/g++-11')
-env.Replace(CC='/opt/homebrew/bin/gcc-11')
-
 # Check our platform specifics
 if env['platform'] == "osx":
     env['target_path'] += 'osx/'
