@@ -51,9 +51,9 @@ $ cd terrabox
 $ git submodule update --init
 $ cd godot-cpp
 $ git submodule update --init
-$ scons platform=linux use_llvm=yes
+$ scons platform=linux generate_bindings=yes use_llvm=yes -j4
 $ cd ..
-$ scons platform=linux
+$ scons platform=linux use_llvm=yes -j4
 ```
 
 ## Build/Install Realsense Lib

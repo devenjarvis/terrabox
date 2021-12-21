@@ -20,7 +20,7 @@ cpp_bindings_path = "godot-cpp/"
 cpp_library = "libgodot-cpp"
 
 # only support 64 at this time..
-bits = 64
+bits = 32
 
 # Updates the environment with the option variables.
 opts.Update(env)
