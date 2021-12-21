@@ -1,0 +1,215 @@
+[gd_scene load_steps=14 format=2]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type spatial;
+render_mode diffuse_toon;
+
+uniform float height_scale = 0.5;
+uniform sampler2D noise;
+uniform sampler2D normalmap;
+
+varying vec2 vertex_position;
+
+float wave(vec2 position){
+  position += texture(noise, position).x * 5.0 - 1.0;
+  vec2 wv = 1.0 - abs(sin(position));
+  return pow(1.0 - pow(wv.x * wv.y, 0.65), 4.0);
+}
+
+float height(vec2 position, float time) {
+  float d = wave((position + time * 0.1) * 0.4) * 0.05;
+  d += wave((position - time * 0.1) * 0.3) * 0.05;
+  d += wave((position + time * 0.1) * 0.5) * 0.05;
+  d += wave((position - time * 0.1) * 0.6) * 0.05;
+  return d;
+}
+
+void vertex() {
+	vertex_position = vec2(0.5 - VERTEX.x/16.0, 0.5 - VERTEX.z/9.0);
+	float k = height(vertex_position, TIME);
+	VERTEX.y = k;
+	vec2 e = vec2(0.01, 0.0);
+	vec3 normal = normalize(vec3(height(vertex_position - e, TIME) - height(vertex_position + e, TIME), 2.0 * e.x, height(vertex_position - e.yx, TIME) - height(vertex_position + e.yx, TIME)));
+	NORMAL = normal;
+}
+
+void fragment() {
+	NORMAL = normalize(cross(dFdx(VERTEX), dFdy(VERTEX)));
+	
+	RIM = 0.5;
+	METALLIC = 0.2;
+	SPECULAR = 0.1;
+	ROUGHNESS = 0.9;
+	ALBEDO = vec3(0.01, 0.07, 0.1);
+	NORMALMAP = texture(normalmap, vertex_position).xyz;
+	ALPHA = 0.70;
+}"
+
+[sub_resource type="OpenSimplexNoise" id=2]
+
+[sub_resource type="NoiseTexture" id=3]
+noise = SubResource( 2 )
+
+[sub_resource type="OpenSimplexNoise" id=4]
+
+[sub_resource type="NoiseTexture" id=5]
+as_normalmap = true
+noise = SubResource( 4 )
+
+[sub_resource type="ShaderMaterial" id=6]
+shader = SubResource( 1 )
+shader_param/height_scale = 0.5
+shader_param/noise = SubResource( 3 )
+shader_param/normalmap = SubResource( 5 )
+
+[sub_resource type="PlaneMesh" id=7]
+material = SubResource( 6 )
+size = Vector2( 16, 9 )
+subdivide_width = 20
+subdivide_depth = 10
+
+[sub_resource type="Shader" id=8]
+code = "shader_type spatial;
+
+uniform sampler2D normalmap;
+uniform sampler2D realsense_heightmap;
+uniform float height_scale = 1.0;
+
+varying float vertex_height;
+varying vec3 vertex_normal;
+
+float get_height(vec2 position) {
+	float height = texture(realsense_heightmap, position).r;
+	
+	return (0.5 - height) * height_scale;
+}
+
+void vertex() {
+	vec2 coord = vec2(0.5 - VERTEX.x/16.0, 0.5 - VERTEX.z/9.0);
+	VERTEX.y += get_height(coord);
+	
+	vec2 e = vec2(0.01, 0.0);
+	vec3 normal = normalize(vec3(get_height(coord - e) - get_height(coord + e), 2.0 * e.x, get_height(coord - e.yx) - get_height(coord + e.yx)));
+	NORMAL = normal;
+	
+	//NORMAL = normalize(vec3(get_height(coord) - get_height(coord + vec2(0.1, 0.0)), 0.1, get_height(coord) - get_height(coord + vec2(0.0, 0.1))));
+	
+	vertex_height = VERTEX.y;
+	vertex_normal = NORMAL;
+}
+
+void fragment() {
+	NORMAL = normalize(cross(dFdx(VERTEX), dFdy(VERTEX)));
+	
+	float slope = 1.0 - dot(vertex_normal, vec3(0.0, 1.0, 0.0));
+	float altitude = (vertex_height/height_scale) + 0.5;
+	
+	//#7f9e31
+	vec3 grass = vec3(0.49804, 0.61961, 0.19216);
+	//#ead2ac
+	vec3 sand = vec3(0.91765, 0.82353, 0.67451);
+	//#353527
+	vec3 rock = vec3(0.20784, 0.20784, 0.15294);
+	//#6b542a
+	vec3 dirt = vec3(0.41961, 0.32941, 0.16471);
+	//#f2f4f3
+	vec3 snow = vec3(0.94902, 0.95686, 0.95294);
+
+	
+	if (altitude <= 0.1) {
+		ALBEDO = sand;
+	} 
+	if (altitude > 0.1 && altitude <= 0.7) {
+		if (slope <= 0.7) {
+			ALBEDO = grass;
+		} 
+		if (slope > 0.7 && slope <= 0.95) {
+			ALBEDO = dirt;
+		} 
+		if (slope > 0.95) {
+			ALBEDO = rock;
+		}
+	} 
+	if (altitude > 0.7 && altitude <= 0.9) {
+		ALBEDO = rock;
+	} 
+	if (altitude > 0.9) {
+		ALBEDO = snow;
+	}
+	
+	ROUGHNESS = 0.9;
+}"
+
+[sub_resource type="OpenSimplexNoise" id=9]
+
+[sub_resource type="NoiseTexture" id=10]
+seamless = true
+as_normalmap = true
+noise = SubResource( 9 )
+
+[sub_resource type="ShaderMaterial" id=11]
+shader = SubResource( 8 )
+shader_param/height_scale = 0.5
+shader_param/normalmap = SubResource( 10 )
+
+[sub_resource type="PlaneMesh" id=12]
+material = SubResource( 11 )
+size = Vector2( 16, 9 )
+subdivide_width = 152
+subdivide_depth = 86
+
+[sub_resource type="GDScript" id=13]
+script/source = "extends MeshInstance
+
+#Load realsense
+var realsense = preload(\"res://bin/osx/gdrealsense.gdns\").new()
+
+var texture = ImageTexture.new()
+var img = Image.new()
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	var depth_array = realsense.get_depth_frame()
+
+	img.create_from_data(realsense.get_frame_width() - 32, realsense.get_frame_height() - 18, false, Image.FORMAT_R8, depth_array)
+	texture.create_from_image(img, 2048)
+	
+	#img.save_png(\"./test.png\")
+	
+
+	# Upload the texture to my shader
+	mesh.material.set_shader_param(\"realsense_heightmap\", texture)
+	mesh.material.set_shader_param(\"height_scale\", 2.0)
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(_delta):
+	var depth_array = realsense.get_depth_frame()
+	
+	img.create_from_data(realsense.get_frame_width() - 32, realsense.get_frame_height() - 18, false, Image.FORMAT_R8, depth_array)
+	texture.set_data(img)
+	
+	#mesh.material.set_shader_param(\"realsense_heightmap\", texture)
+
+"
+
+[node name="Main" type="Spatial"]
+
+[node name="Water" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0 )
+mesh = SubResource( 7 )
+material/0 = null
+
+[node name="Sun" type="DirectionalLight" parent="."]
+transform = Transform( -1.62921e-07, -0.5, 0.866026, 0, 0.866025, 0.5, -1, 8.14603e-08, -1.41093e-07, 8, 4, 0 )
+light_energy = 0.8
+shadow_enabled = true
+
+[node name="Terrain" type="MeshInstance" parent="."]
+mesh = SubResource( 12 )
+material/0 = null
+script = SubResource( 13 )
+
+[node name="Avatar" type="Spatial" parent="."]
+
+[node name="Camera" type="Camera" parent="Avatar"]
+transform = Transform( -1, 8.74228e-08, 3.82137e-15, 0, -4.37114e-08, 1, 8.74228e-08, 1, 4.37114e-08, 0, 5.3, 0 )

@@ -1,0 +1,19 @@
+version: "3.9"
+services:
+  terrabox:
+    privileged: true
+    build: ./src
+    platform: "linux/amd64"
+    volumes: 
+      - /dev:/dev
+    device_cgroup_rules:
+      - 'c 81:* rmw'
+      - 'c 189:* rmw'
+    #environment:
+    #  - ENV=local
+    #  - AWS_ACCESS_KEY_ID=foobar
+    #  - AWS_SECRET_ACCESS_KEY=foobar
+    #ports:
+    #  - "80:80"
+    #volumes:
+    #  - ./src:/app/app
