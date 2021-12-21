@@ -11,44 +11,50 @@ https://www.raspberrypi.com/documentation/computers/getting-started.html
 ## Install Realsense lib
 Once Ubuntu is setup on your Raspberry Pi and you are able to access it, we need to install the Realsense lib on your Pi. To do so follow these instructions:
 
-`sudo apt install clang llvm`  
-`cd ~/librealsense`  
-`mkdir build`  
-`cd build`  
-`export CC=/usr/bin/clang`  
-`export CXX=/usr/bin/clang++`  
-`cmake .. -DBUILD_EXAMPLES=true -DCMAKE_BUILD_TYPE=Release -DFORCE_LIBUVC=true -DOTHER_LIBS="-latomic"`  
-`make -j4`  
-`sudo make install`  
-
+```console
+$ sudo apt install clang llvm
+$ cd ~/librealsense
+$ mkdir build
+$ cd build
+$ export CC=/usr/bin/clang
+$ export CXX=/usr/bin/clang++
+$ cmake .. -DBUILD_EXAMPLES=true -DCMAKE_BUILD_TYPE=Release -DFORCE_LIBUVC=true -DOTHER_LIBS="-latomic"
+$ make -j4
+$ sudo make install
+```
 
 
 ## Install Godot
 Now that the realsense lib has been successfully installed on your system we want to install the Godot game engine so we can run, test, and build Terrabox. You can setup Godot with the following instructions:
 
 Clone and build latest stable 3.X Godot
-`sudo apt-get install build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev`  
-`git clone https://github.com/godotengine/godot.git -b 3.x`  
-`cd ./godot`  
-`scons platform=x11 target=release_debug tools=yes use_llvm=yes CCFLAGS="-mtune=cortex-a72 -mcpu=cortex-a72 -mfloat-abi=hard -mlittle-endian -munaligned-access -mfpu=neon-fp-armv8" -j4`  
+```console
+$ sudo apt-get install build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev
+$ git clone https://github.com/godotengine/godot.git -b 3.x
+$ cd ./godot
+$ scons platform=x11 target=release_debug tools=yes use_llvm=yes CCFLAGS="-mtune=cortex-a72 -mcpu=cortex-a72 -mfloat-abi=hard -mlittle-endian -munaligned-access -mfpu=neon-fp-armv8" -j4
+```
 
 Build export templates
-`scons platform=x11 tools=no target=release use_llvm=yes CCFLAGS="-mtune=cortex-a72 -mcpu=cortex-a72 -mfloat-abi=hard -mlittle-endian -munaligned-access -mfpu=neon-fp-armv8" bits=64 -j4`  
-`scons platform=x11 tools=no target=release_debug use_llvm=yes CCFLAGS="-mtune=cortex-a72 -mcpu=cortex-a72 -mfloat-abi=hard -mlittle-endian -munaligned-access -mfpu=neon-fp-armv8" bits=64 -j4`  
-`cd ./bin`  
-`mkdir /home/ubuntu/.local/share/godot/templates/3.4.1.rc`  
-`mv godot.x11.opt.64.llvm ~/.local/share/godot/templates/3.4.1.rc/linux_x11_64_release`  
-`mv godot.x11.opt.debug.64.llvm ~/.local/share/godot/templates/3.4.1.rc/linux_x11_64_debug`  
-
+```console
+$ scons platform=x11 tools=no target=release use_llvm=yes CCFLAGS="-mtune=cortex-a72 -mcpu=cortex-a72 -mfloat-abi=hard -mlittle-endian -munaligned-access -mfpu=neon-fp-armv8" bits=64 -j4
+$ scons platform=x11 tools=no target=release_debug use_llvm=yes CCFLAGS="-mtune=cortex-a72 -mcpu=cortex-a72 -mfloat-abi=hard -mlittle-endian -munaligned-access -mfpu=neon-fp-armv8" bits=64 -j4
+$ cd ./bin
+$ mkdir /home/ubuntu/.local/share/godot/templates/3.4.1.rc
+$ mv godot.x11.opt.64.llvm ~/.local/share/godot/templates/3.4.1.rc/linux_x11_64_release
+$ mv godot.x11.opt.debug.64.llvm ~/.local/share/godot/templates/3.4.1.rc/linux_x11_64_debug
+```
 ## Pull down and setup this project
-`git clone https://github.com/devenjarvis/terrabox.git`  
-`cd terrabox`  
-`git submodule update --init`  
-`cd godot-cpp`  
-`git submodule update --init`  
-`scons platform=linux use_llvm=yes`  
-`cd ..`  
-`scons platform=linux`  
+```console
+$ git clone https://github.com/devenjarvis/terrabox.git
+$ cd terrabox
+$ git submodule update --init
+$ cd godot-cpp
+$ git submodule update --init
+$ scons platform=linux use_llvm=yes
+$ cd ..
+$ scons platform=linux
+```
 
 ## Build/Install Realsense Lib
 Make sure you've built/installed the realsense library on your system. This process can vary by OS/System, check the README for instructions: https://github.com/IntelRealSense/librealsense
