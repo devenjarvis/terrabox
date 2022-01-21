@@ -1,0 +1,89 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://test_ig.gd" type="Script" id=1]
+
+[sub_resource type="Shader" id=2]
+code = "shader_type spatial;
+//render_mode unshaded;
+
+uniform sampler2D realsense_heightmap;
+uniform float height_scale = 0.5;
+
+varying float vertex_height;
+varying vec3 vertex_normal;
+
+float get_height(vec2 position) {
+	float height = texture(realsense_heightmap, position).r;
+	
+	return (0.5 - height) * height_scale;
+}
+
+void vertex() {
+//	vec2 coord = VERTEX.xz / 2.0 + 0.5;//vec2(0.5 - VERTEX.x/16.0, 0.5 - VERTEX.z/9.0);
+//	float height = texture(realsense_heightmap, coord).x * height_scale;
+//	VERTEX.y += height;
+//	COLOR.xyz = vec3(height);
+//
+//	vec2 e = vec2(0.01, 0.0);
+//	vec3 normal = normalize(vec3(get_height(coord - e) - get_height(coord + e), 2.0 * e.x, get_height(coord - e.yx) - get_height(coord + e.yx)));
+//	NORMAL = normal;
+	
+	//NORMAL = normalize(vec3(get_height(coord) - get_height(coord + vec2(0.1, 0.0)), 0.1, get_height(coord) - get_height(coord + vec2(0.0, 0.1))));
+	
+	vertex_height = VERTEX.y;
+	vertex_normal = NORMAL;
+}
+
+void fragment() {
+	float slope = 1.0 - dot(vertex_normal, vec3(0.0, 1.0, 0.0));
+	float altitude = (vertex_height/height_scale) + 0.5;
+
+	//#7f9e31
+	vec3 grass = vec3(0.49804, 0.61961, 0.19216);
+	//#ead2ac
+	vec3 sand = vec3(0.91765, 0.82353, 0.67451);
+	//#353527
+	vec3 rock = vec3(0.20784, 0.20784, 0.15294);
+	//#6b542a
+	vec3 dirt = vec3(0.41961, 0.32941, 0.16471);
+	//#f2f4f3
+	vec3 snow = vec3(0.94902, 0.95686, 0.95294);
+
+
+	if (altitude <= 0.1) {
+		ALBEDO = sand;
+	} 
+	if (altitude > 0.1 && altitude <= 0.7) {
+		if (slope <= 0.7) {
+			ALBEDO = grass;
+		} 
+		if (slope > 0.7 && slope <= 0.95) {
+			ALBEDO = dirt;
+		} 
+		if (slope > 0.95) {
+			ALBEDO = rock;
+		}
+	} 
+	if (altitude > 0.7 && altitude <= 0.9) {
+		ALBEDO = rock;
+	} 
+	if (altitude > 0.9) {
+		ALBEDO = snow;
+	}
+
+	ROUGHNESS = 0.9;
+}"
+
+[sub_resource type="ShaderMaterial" id=1]
+shader = SubResource( 2 )
+shader_param/height_scale = 0.5
+
+[node name="Spatial" type="Spatial"]
+
+[node name="Camera" type="Camera" parent="."]
+transform = Transform( -1, 8.74228e-08, 0, -8.74228e-08, -1, 0, 0, 0, 1, 0, 0, 0 )
+
+[node name="ImmediateGeometry" type="ImmediateGeometry" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 1, -3 )
+material_override = SubResource( 1 )
+script = ExtResource( 1 )
