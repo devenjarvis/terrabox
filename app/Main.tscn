@@ -20,10 +20,10 @@ var st = SurfaceTool.new()
 var img = Image.new()
 var mdt = MeshDataTool.new()
 var t_off = 55
-var r_off = 70
-var b_off = 50
-var l_off = 110
-var segment_size = 5
+var r_off = 20
+var b_off = 26
+var l_off = 55
+var segment_size = 3
 var sea_level = 0.1
 var material
 var rng = RandomNumberGenerator.new()
@@ -80,11 +80,11 @@ func set_color(mesh_height):
 	
 	if mesh_height <= sea_level: # Water
 		color = Color(0.35686 + rand, 0.75294 + rand, 0.92156 + rand)
-	elif mesh_height > sea_level and mesh_height <= (sea_level + 0.2): # Sand
+	elif mesh_height > sea_level and mesh_height <= (sea_level + 0.1): # Sand
 		color = Color(0.91765 + rand, 0.82353 + rand, 0.67451 + rand)
-	elif mesh_height > (sea_level + 0.2) and mesh_height <= (sea_level + 0.5): # Grass
+	elif mesh_height > (sea_level + 0.1) and mesh_height <= (sea_level + 0.3): # Grass
 		color = Color(0.49804 + rand, 0.61961 + rand, 0.19216 + rand)
-	elif mesh_height > (sea_level + 0.5): # Rock
+	elif mesh_height > (sea_level + 0.3): # Rock
 		color = Color(0.20784 + rand, 0.20784 + rand, 0.15294 + rand)
 	
 	return color
@@ -99,8 +99,10 @@ func _process(_delta):
 
 	for i in range(mdt.get_vertex_count()):
 		var vert=mdt.get_vertex(i)
-		var x = (vert.x * width)/8.0
+		var x = (vert.x  * width)/8.0
 		var y = (vert.z * height)/4.5
+		x = x + ((x - (width/2.0))/(width/2.0)*4)
+		y = y + ((y - (height/2.0))/(height/2.0)*2.0)
 		var mesh_height = 1.0 - img.get_pixel(x, y).r
 
 		if typeof(mdt.get_vertex_meta(i)) == TYPE_REAL:
