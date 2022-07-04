@@ -2,8 +2,9 @@
 An open source augemented reality sandbox prototype, built with an Intel Realsense D415 camera, a Raspberry Pi 4, the Godot game engine, and a custom built apparatus. This was built as a custom prototype and may not work out-of-the-box for other users. 
 
 # Summary
-![Portait view of AR Sandbox, running](/media/ar_sandbox_portait.png)
-![Clous-up view of AR Sandbox, running](/media/ar_sandbox_closeup.png)
+![Portrait view of AR Sandbox, running](/media/ar_sandbox_portrait.png)
+
+![Close-up view of AR Sandbox, running](/media/ar_sandbox_closeup.png)
 
 
 
