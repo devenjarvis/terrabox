@@ -1,6 +1,13 @@
-# TerraBox (Prototype)
-A completely open source augemented reality sandbox prototype, built with an Intel Realsense D415 camera, a Raspberry Pi 4, the Godot game engine, and a custom built apparatus.
+# TerraBox  - A prototype
+An open source augemented reality sandbox prototype, built with an Intel Realsense D415 camera, a Raspberry Pi 4, the Godot game engine, and a custom built apparatus. This was built as a custom prototype and may not work out-of-the-box for other users. 
 
+# Summary
+![Portait view of AR Sandbox, running](/media/ar_sandbox_portait.png)
+![Clous-up view of AR Sandbox, running](/media/ar_sandbox_closeup.png)
+
+
+
+# Building
 ## Setup Raspberry Pi
 This project assumes, and has only been tested with, a 4GB Raspberry Pi 4. Any other version of pi is untested and comes with no guarantees or support expectations. Furthermore, this project expects your Raspberry Pi 4 to be running a 32bit version of Raspbian. Please reference the following instructions for proper setup:
 
