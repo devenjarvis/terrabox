@@ -13,7 +13,7 @@ subdivide_depth = 86
 [sub_resource type="GDScript" id=7]
 script/source = "extends MeshInstance
 
-const DEBUG = true
+const DEBUG = false
 
 # Use SimplexNoise if debug enabled, else use GDRealsense
 var realsense = OpenSimplexNoise.new() if (DEBUG) else load(\"res://bin/x11/gdrealsense.gdns\").new()
@@ -29,6 +29,7 @@ var segment_size = 3
 var sea_level = 0.02
 var material
 var rng = RandomNumberGenerator.new()
+
 
 func get_frame():
 	var width : float
@@ -80,32 +81,31 @@ func _ready():
 				st.add_index((vert_x_width * next_vert_y) + next_vert_x)
 				st.add_index((vert_x_width * next_vert_y) + vert_x)
 
-	# st.index()
-	#st.generate_normals()
-	#st.generate_tangents()
 	st.set_material(material)
 	# Commit to a mesh.
 	mesh = st.commit()
 	mdt.create_from_surface(mesh, 0)
 	img.unlock()
 	
-func set_color(mesh_height):
-	#print(mesh_height)
-	var color = Color(1.0, 0.0, 0.0)
+func set_color_terrain(mesh_height):
+	var color: Color
 	var rand = (rng.randf() - 0.5) * 0.2
 	
-	if mesh_height <= sea_level: # Water
-		color = Color(0.35686 + rand, 0.75294 + rand, 0.92156 + rand)
-	elif mesh_height > sea_level and mesh_height <= (sea_level + 0.05): # Sand
-		color = Color(0.91765 + rand, 0.82353 + rand, 0.67451 + rand)
-	elif mesh_height > (sea_level + 0.05) and mesh_height <= (sea_level + 0.3): # Grass
-		color = Color(0.49804 + rand, 0.61961 + rand, 0.19216 + rand)
-	elif mesh_height > (sea_level + 0.3) and mesh_height <= (sea_level + 0.6): # Grass
-		# color = Color(0.20784 + rand, 0.20784 + rand, 0.15294 + rand)
-		# color = Color(0.93725 + rand, 0.94509 + rand, 0.95294 + rand)
-		color = Color((208.0/255.0)+rand, (83.0/255.0) + rand, (83/255) + rand)
+	if mesh_height <= sea_level: 
+		color = Color(\"#5bc0eb\") # Water
+	elif mesh_height > sea_level and mesh_height <= (sea_level + 0.05):
+		color = Color(\"#ead2ac\") # Sand
+	elif mesh_height > (sea_level + 0.05) and mesh_height <= (sea_level + 0.3): 
+		color = Color(\"#7f9e31\") # Grass
+	elif mesh_height > (sea_level + 0.3) and mesh_height <= (sea_level + 0.6):
+		color = Color(\"#ba3d3d\") # Lava?
 	else:
-		color = Color(0.93725 + rand, 0.94509 + rand, 0.95294 + rand)
+		color = Color(\"#eff1f3\") # Snow?
+	
+	# Randomize color
+	color.r = color.r + rand
+	color.g = color.g + rand
+	color.b = color.b + rand
 	return color
 	
 func _process(_delta):	
@@ -121,17 +121,15 @@ func _process(_delta):
 		var vert=mdt.get_vertex(i)
 		var x = (vert.x  * frame.width)/8.0
 		var y = (vert.z * frame.height)/4.5
-		#x = x + ((x - (width/2.0))/(width/2.0)*4)
-		#y = y + ((y - (height/2.0))/(height/2.0)*2.0)
 		var mesh_height = 1.0 - img.get_pixel(x, y).r
 
 		if typeof(mdt.get_vertex_meta(i)) == TYPE_REAL:
 			if (mesh_height <= sea_level and Engine.get_idle_frames() % 20 == 0): # Update water colors every 20 frames
-				mdt.set_vertex_color(i, set_color(mesh_height))
+				mdt.set_vertex_color(i, set_color_terrain(mesh_height))
 			elif abs(mdt.get_vertex_meta(i) - mesh_height) > 0.05: # Only update terrain colors when signficant change since last frame
-				mdt.set_vertex_color(i, set_color(mesh_height))
+				mdt.set_vertex_color(i, set_color_terrain(mesh_height))
 		else:
-			mdt.set_vertex_color(i, set_color(mesh_height))
+			mdt.set_vertex_color(i, set_color_terrain(mesh_height))
 		
 		mdt.set_vertex_meta(i, mesh_height)
 
