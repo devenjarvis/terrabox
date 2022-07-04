@@ -19,12 +19,12 @@ var realsense = preload(\"res://bin/x11/gdrealsense.gdns\").new()
 var st = SurfaceTool.new()
 var img = Image.new()
 var mdt = MeshDataTool.new()
-var t_off = 55
-var r_off = 20
-var b_off = 26
-var l_off = 55
+var t_off = 75
+var r_off = 50
+var b_off = 40
+var l_off = 120
 var segment_size = 3
-var sea_level = 0.1
+var sea_level = 0.02
 var material
 var rng = RandomNumberGenerator.new()
 #
@@ -80,19 +80,25 @@ func set_color(mesh_height):
 	
 	if mesh_height <= sea_level: # Water
 		color = Color(0.35686 + rand, 0.75294 + rand, 0.92156 + rand)
-	elif mesh_height > sea_level and mesh_height <= (sea_level + 0.1): # Sand
+	elif mesh_height > sea_level and mesh_height <= (sea_level + 0.05): # Sand
 		color = Color(0.91765 + rand, 0.82353 + rand, 0.67451 + rand)
-	elif mesh_height > (sea_level + 0.1) and mesh_height <= (sea_level + 0.3): # Grass
+	elif mesh_height > (sea_level + 0.05) and mesh_height <= (sea_level + 0.3): # Grass
 		color = Color(0.49804 + rand, 0.61961 + rand, 0.19216 + rand)
-	elif mesh_height > (sea_level + 0.3): # Rock
-		color = Color(0.20784 + rand, 0.20784 + rand, 0.15294 + rand)
-	
+	elif mesh_height > (sea_level + 0.3) and mesh_height <= (sea_level + 0.6): # Grass
+		# color = Color(0.20784 + rand, 0.20784 + rand, 0.15294 + rand)
+		# color = Color(0.93725 + rand, 0.94509 + rand, 0.95294 + rand)
+		color = Color((208.0/255.0)+rand, (83.0/255.0) + rand, (83/255) + rand)
+	else:
+		color = Color(0.93725 + rand, 0.94509 + rand, 0.95294 + rand)
 	return color
 	
 func _process(_delta):
 	var depth_array = realsense.get_depth_frame(t_off, r_off, b_off, l_off, segment_size)
 	var width = realsense.get_frame_width()
 	var height = realsense.get_frame_height()
+	
+	if Input.is_action_pressed(\"toggle_fullscreen\"):
+		OS.window_fullscreen = !OS.window_fullscreen
 
 	img.create_from_data(width, height, false, Image.FORMAT_R8, depth_array)
 	img.lock()
@@ -101,8 +107,8 @@ func _process(_delta):
 		var vert=mdt.get_vertex(i)
 		var x = (vert.x  * width)/8.0
 		var y = (vert.z * height)/4.5
-		x = x + ((x - (width/2.0))/(width/2.0)*4)
-		y = y + ((y - (height/2.0))/(height/2.0)*2.0)
+		#x = x + ((x - (width/2.0))/(width/2.0)*4)
+		#y = y + ((y - (height/2.0))/(height/2.0)*2.0)
 		var mesh_height = 1.0 - img.get_pixel(x, y).r
 
 		if typeof(mdt.get_vertex_meta(i)) == TYPE_REAL:

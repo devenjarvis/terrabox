@@ -37,12 +37,13 @@ $ scons platform=x11 target=release_debug tools=yes use_llvm=yes CCFLAGS="-mtune
 
 Build export templates
 ```console
-$ scons platform=x11 tools=no target=release use_llvm=yes CCFLAGS="-mtune=cortex-a72 -mcpu=cortex-a72 -mfloat-abi=hard -mlittle-endian -munaligned-access -mfpu=neon-fp-armv8" bits=64 -j4
-$ scons platform=x11 tools=no target=release_debug use_llvm=yes CCFLAGS="-mtune=cortex-a72 -mcpu=cortex-a72 -mfloat-abi=hard -mlittle-endian -munaligned-access -mfpu=neon-fp-armv8" bits=64 -j4
+$ scons platform=x11 target=release tools=no use_llvm=yes CCFLAGS="-mcpu=cortex-a72 -mtune=cortex-a72 -mfpu=neon-fp-armv8 -mfloat-abi=hard -mlittle-endian -munaligned-access" -j4
+$ scons platform=x11 tools=no target=release use_llvm=yes CCFLAGS="-mtune=cortex-a72 -mcpu=cortex-a72 -mfloat-abi=hard -mlittle-endian -munaligned-access -mfpu=neon-fp-armv8" bits=32 -j4
+$ scons platform=x11 tools=no target=release_debug use_llvm=yes CCFLAGS="-mtune=cortex-a72 -mcpu=cortex-a72 -mfloat-abi=hard -mlittle-endian -munaligned-access -mfpu=neon-fp-armv8" bits=32 -j4
 $ cd ./bin
-$ mkdir /home/ubuntu/.local/share/godot/templates/3.4.1.rc
-$ mv godot.x11.opt.64.llvm ~/.local/share/godot/templates/3.4.1.rc/linux_x11_64_release
-$ mv godot.x11.opt.debug.64.llvm ~/.local/share/godot/templates/3.4.1.rc/linux_x11_64_debug
+$ mkdir /home/ubuntu/.local/share/godot/templates/3.4.2.rc
+$ mv godot.x11.opt.32.llvm ~/.local/share/godot/templates/3.4.2.rc/linux_x11_32_release
+$ mv godot.x11.opt.debug.32.llvm ~/.local/share/godot/templates/3.4.2.rc/linux_x11_32_debug
 ```
 ## Pull down and setup this project
 ```console
