@@ -12,10 +12,13 @@ subdivide_depth = 86
 
 [sub_resource type="GDScript" id=7]
 script/source = "extends MeshInstance
-#
-##Load realsense
-var realsense = preload(\"res://bin/x11/gdrealsense.gdns\").new()
-#
+
+const DEBUG = false
+
+# Use SImplexNoise if debug enabled
+var realsense = OpenSimplexNoise.new() if (DEBUG) else load(\"res://bin/x11/gdrealsense.gdns\").new()
+
+
 var st = SurfaceTool.new()
 var img = Image.new()
 var mdt = MeshDataTool.new()
@@ -27,29 +30,43 @@ var segment_size = 3
 var sea_level = 0.02
 var material
 var rng = RandomNumberGenerator.new()
-#
-## Called when the node enters the scene tree for the first time.
+
+func get_frame():
+	var width : float
+	var height: float
+	var depth_array: PoolByteArray
+	if DEBUG:
+		realsense.seed = randi()
+		width = ceil((1280 - r_off - l_off)/segment_size) + 1
+		height = ceil((600 - t_off - b_off)/segment_size) + 1
+		depth_array = realsense.get_image(width, height).get_data()
+	else:
+		depth_array = realsense.get_depth_frame(t_off, r_off, b_off, l_off,segment_size)
+		width = realsense.get_frame_width()
+		height = realsense.get_frame_height()
+		
+	return {\"width\": width, \"height\": height, \"depth_array\": depth_array}
+
+# Called when the node enters the scene tree for the first time.
 func _ready():
 	material = mesh.material
 	rng.randomize()
 	
-	var depth_array = realsense.get_depth_frame(t_off, r_off, b_off, l_off,segment_size)
-	var width = realsense.get_frame_width()
-	var height = realsense.get_frame_height()
+	var frame = get_frame()
 
-	img.create_from_data(width, height, false, Image.FORMAT_R8, depth_array)
+	img.create_from_data(frame.width, frame.height, false, Image.FORMAT_R8, frame.depth_array)
 	img.lock()
 
 	st.clear()
 
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 
-	var vert_x_width = width - 1
-	var vert_y_height = height - 1
-	for y in range(height):
-		for x in range(width):
+	var vert_x_width = frame.width - 1
+	var vert_y_height = frame.height - 1
+	for y in range(frame.height):
+		for x in range(frame.width):
 			st.add_smooth_group(true)
-			st.add_vertex(Vector3(((8.0*x)/(width)), 0.0, ((4.5 * y)/(height))))
+			st.add_vertex(Vector3(((8.0*x)/(frame.width)), 0.0, ((4.5 * y)/(frame.height))))
 			# Build indices for a complete mesh
 			var vert_y = y
 			var vert_x = x
@@ -92,21 +109,19 @@ func set_color(mesh_height):
 		color = Color(0.93725 + rand, 0.94509 + rand, 0.95294 + rand)
 	return color
 	
-func _process(_delta):
-	var depth_array = realsense.get_depth_frame(t_off, r_off, b_off, l_off, segment_size)
-	var width = realsense.get_frame_width()
-	var height = realsense.get_frame_height()
+func _process(_delta):	
+	var frame = get_frame()
 	
 	if Input.is_action_pressed(\"toggle_fullscreen\"):
 		OS.window_fullscreen = !OS.window_fullscreen
 
-	img.create_from_data(width, height, false, Image.FORMAT_R8, depth_array)
+	img.create_from_data(frame.width, frame.height, false, Image.FORMAT_R8, frame.depth_array)
 	img.lock()
 
 	for i in range(mdt.get_vertex_count()):
 		var vert=mdt.get_vertex(i)
-		var x = (vert.x  * width)/8.0
-		var y = (vert.z * height)/4.5
+		var x = (vert.x  * frame.width)/8.0
+		var y = (vert.z * frame.height)/4.5
 		#x = x + ((x - (width/2.0))/(width/2.0)*4)
 		#y = y + ((y - (height/2.0))/(height/2.0)*2.0)
 		var mesh_height = 1.0 - img.get_pixel(x, y).r
