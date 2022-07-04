@@ -13,19 +13,18 @@ subdivide_depth = 86
 [sub_resource type="GDScript" id=7]
 script/source = "extends MeshInstance
 
-const DEBUG = false
+const DEBUG = true
 
-# Use SImplexNoise if debug enabled
+# Use SimplexNoise if debug enabled, else use GDRealsense
 var realsense = OpenSimplexNoise.new() if (DEBUG) else load(\"res://bin/x11/gdrealsense.gdns\").new()
-
 
 var st = SurfaceTool.new()
 var img = Image.new()
 var mdt = MeshDataTool.new()
-var t_off = 75
-var r_off = 50
-var b_off = 40
-var l_off = 120
+var top_offset = 75
+var right_offset = 50
+var bottom_offset = 40
+var left_offset = 120
 var segment_size = 3
 var sea_level = 0.02
 var material
@@ -37,11 +36,11 @@ func get_frame():
 	var depth_array: PoolByteArray
 	if DEBUG:
 		realsense.seed = randi()
-		width = ceil((1280 - r_off - l_off)/segment_size) + 1
-		height = ceil((600 - t_off - b_off)/segment_size) + 1
+		width = ceil((1280 - right_offset - left_offset)/segment_size) + 1
+		height = ceil((600 - top_offset - bottom_offset)/segment_size) + 1
 		depth_array = realsense.get_image(width, height).get_data()
 	else:
-		depth_array = realsense.get_depth_frame(t_off, r_off, b_off, l_off,segment_size)
+		depth_array = realsense.get_depth_frame(top_offset, right_offset, bottom_offset, left_offset,segment_size)
 		width = realsense.get_frame_width()
 		height = realsense.get_frame_height()
 		
