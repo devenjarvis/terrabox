@@ -13,7 +13,7 @@ subdivide_depth = 86
 [sub_resource type="GDScript" id=7]
 script/source = "extends MeshInstance
 
-const DEBUG = true
+const DEBUG = false
 
 # Use SimplexNoise if debug enabled, else use GDRealsense
 var realsense = OpenSimplexNoise.new() if (DEBUG) else load(\"res://bin/x11/gdrealsense.gdns\").new()
