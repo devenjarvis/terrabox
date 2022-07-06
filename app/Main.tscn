@@ -108,6 +108,29 @@ func set_color_terrain(mesh_height):
 	color.b = color.b + rand
 	return color
 	
+func set_color_rainbow(mesh_height):
+	var color: Color
+	var rand = (rng.randf() - 0.5) * 0.2
+	
+	if mesh_height <= sea_level: 
+		color = Color(\"#BA1B1D\") # Red
+	elif mesh_height > sea_level and mesh_height <= (sea_level + 0.2):
+		color = Color(\"#FF9B71\") # Orange
+	elif mesh_height > (sea_level + 0.2) and mesh_height <= (sea_level + 0.4): 
+		color = Color(\"#F7D002\") # Yellow
+	elif mesh_height > (sea_level + 0.4) and mesh_height <= (sea_level + 0.6):
+		color = Color(\"#018E42\") # Green
+	elif mesh_height > (sea_level + 0.6) and mesh_height <= (sea_level + 0.8):
+		color = Color(\"#454E9E\") # Blue
+	else:
+		color = Color(\"#662E9B\") # Violet
+	
+	# Randomize color
+	color.r = color.r + rand
+	color.g = color.g + rand
+	color.b = color.b + rand
+	return color
+	
 func _process(_delta):	
 	var frame = get_frame()
 	
@@ -125,11 +148,11 @@ func _process(_delta):
 
 		if typeof(mdt.get_vertex_meta(i)) == TYPE_REAL:
 			if (mesh_height <= sea_level and Engine.get_idle_frames() % 20 == 0): # Update water colors every 20 frames
-				mdt.set_vertex_color(i, set_color_terrain(mesh_height))
+				mdt.set_vertex_color(i, set_color_rainbow(mesh_height))
 			elif abs(mdt.get_vertex_meta(i) - mesh_height) > 0.05: # Only update terrain colors when signficant change since last frame
-				mdt.set_vertex_color(i, set_color_terrain(mesh_height))
+				mdt.set_vertex_color(i, set_color_rainbow(mesh_height))
 		else:
-			mdt.set_vertex_color(i, set_color_terrain(mesh_height))
+			mdt.set_vertex_color(i, set_color_rainbow(mesh_height))
 		
 		mdt.set_vertex_meta(i, mesh_height)
 
