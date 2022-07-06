@@ -114,13 +114,13 @@ func set_color_rainbow(mesh_height):
 	
 	if mesh_height <= sea_level: 
 		color = Color(\"#BA1B1D\") # Red
-	elif mesh_height > sea_level and mesh_height <= (sea_level + 0.2):
+	elif mesh_height > sea_level and mesh_height <= (sea_level + 0.15):
 		color = Color(\"#FF9B71\") # Orange
-	elif mesh_height > (sea_level + 0.2) and mesh_height <= (sea_level + 0.4): 
+	elif mesh_height > (sea_level + 0.15) and mesh_height <= (sea_level + 0.3): 
 		color = Color(\"#F7D002\") # Yellow
-	elif mesh_height > (sea_level + 0.4) and mesh_height <= (sea_level + 0.6):
+	elif mesh_height > (sea_level + 0.3) and mesh_height <= (sea_level + 0.45):
 		color = Color(\"#018E42\") # Green
-	elif mesh_height > (sea_level + 0.6) and mesh_height <= (sea_level + 0.8):
+	elif mesh_height > (sea_level + 0.45) and mesh_height <= (sea_level + 0.6):
 		color = Color(\"#454E9E\") # Blue
 	else:
 		color = Color(\"#662E9B\") # Violet
